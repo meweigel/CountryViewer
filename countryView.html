@@ -1,0 +1,98 @@
+<!--
+/*
+ * Copyright 2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+Author: Michael E. Weigel
+-->
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Country Views</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="style/countryView.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+        <script src="controllers/countryView.js"></script>
+    </head>      
+    <body>
+        <div ng-app="countryViewApp" ng-controller="countryViewCtrl"> 
+            <h1>Country Viewer</h1>
+            <br>
+            <form id="control">
+                <div id="buttonGroup">
+                    <button ng-click="loadCountries(0)">{{viewList[0]}}</button>
+                    <button ng-click="loadCountries(1)">{{viewList[1]}}</button>
+                    <button ng-click="loadCountries(2)">{{viewList[2]}}</button>
+                    <button ng-click="loadCountries(3)">{{viewList[3]}}</button>
+                </div>
+                <br><br><br>  
+                <div id="filterGroup">
+                    <div class="filter">
+                        <h3>Continent</h3>
+                        <select ng-model="selectedContinent">
+                            <option ng-repeat="x in continents">{{x}}</option>
+                        </select>
+                    </div>
+                    <div class="filter">
+                        <h3>Region</h3>
+                        <select ng-model="selectedRegion">
+                            <option ng-repeat="x in regions">{{x}}</option>
+                        </select>
+                    </div>
+                    <div class="filter">
+                        <h3>Government</h3>
+                        <select ng-model="selectedGovernment">
+                            <option ng-repeat="x in governments">{{x}}</option>
+                        </select>
+                    </div>
+                    <div class="filter">
+                        <h3>Official Language</h3>
+                        <select ng-model="selectedLanguage">
+                            <option ng-repeat="x in languages">{{x}}</option>
+                        </select>
+                    </div>
+                </div>
+            </form>  
+            <form id="display" ng-hide="hide">
+                <div class="input-group-addon"><i class="fa fa-search"></i> 
+                    <input id="search" type="text" placeholder="Search" ng-model="searchCountry">
+                </div> 
+                <h3 id="view">{{selectedView}}</h3>
+                <table id="table">
+                    <thead>
+                        <tr>
+                            <th ng-repeat="key in notSorted(cols[n])" ng-init="value = cols[n][key]">
+                                <a href="#" ng-click="sortTable(key, sortReverse); sortType = value; sortReverse = !sortReverse">
+                                    {{value}}
+                                    <span ng-show="sortType === value && !sortReverse" class="fa fa-caret-down"></span>
+                                    <span ng-show="sortType === value && sortReverse" class="fa fa-caret-up"></span>
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        <tr ng-repeat="country in getCountry(n)| filter:searchCountry">
+                            <td ng-repeat="value in country">{{value}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </body>
+</html>

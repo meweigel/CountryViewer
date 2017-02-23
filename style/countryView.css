@@ -1,0 +1,150 @@
+<!--
+/*
+ * Copyright 2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+/* 
+    Created on : Jan 20, 2017, 10:53:14 PM
+    Author     : mweigel
+*/
+body{
+    padding : 15px;
+    margin : 15px;
+}
+
+h1, h3{
+    text-align: center;
+    margin: 3px;
+}
+
+
+h3#view{
+    margin: 3px 0px 3px 200px;
+}
+
+
+button {
+    padding: 5px;
+    margin: 1px 5px;
+    font-size: 15px;
+    font-weight: 550;
+    display: inline-block;
+    cursor: pointer;
+}
+
+div.filter{
+    padding: 5px;
+    margin: 1px 5px;
+    display: inline-block;
+}
+
+div#buttonGroup{
+    margin: 25px 5px 1px 5px;
+    text-align:center;
+}
+
+div#filterGroup{
+    margin: 1px 5px 25px 5px;
+    text-align:center;
+}
+
+select{
+    padding: 5px;
+    margin: 5px;
+    font-size: 15px;
+    font-weight: 550;
+    cursor: pointer;
+}
+
+form#control {
+    padding: 10px;
+    margin: 10px; 
+    width: 98%;
+    background-color : rgb(255, 153, 102);
+    border: 3px solid grey;
+    border-radius: 25px;	
+    border-style: outset;
+}
+
+form#display {
+    padding: 10px;
+    margin: 10px; 
+    width: 98%;
+    background-color: rgb(230, 230, 230);
+    border: 1px solid grey;
+    border-radius: 25px;	
+}
+
+div.input-group-addon{
+    float: right;
+    width: 230px;
+    margin: 3px 40px 8px 0px;
+}
+
+table {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+}
+
+table thead {
+    /* head takes the height it requires, 
+    and it's not scaled when table is resized */
+    flex: 0 0 auto;
+    width: calc(100% - 1.15em);
+    display: table;
+    table-layout: fixed;
+}
+
+table tbody {
+    /* body takes all the remaining available space */
+    flex: 1 1 auto;
+    display: block;
+    overflow-y: scroll;
+    height: 800px;
+}
+
+table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+table thead, table tbody tr {
+    display: table;
+    table-layout: fixed;
+}
+
+thead th{
+    background-color: rgb(255, 204, 153);
+}
+
+table th, table td {
+    padding: 5px;
+    margin:  5px; 
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+    text-align: center;
+}
+
+table tr:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+
+table tr:nth-child(even) {
+    background-color: #ffffff;
+}
