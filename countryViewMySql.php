@@ -19,46 +19,53 @@ include("connectMySql.php");
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
-$choice = filter_input(INPUT_GET, "choice", FILTER_VALIDATE_INT);
-$continent = filter_input(INPUT_GET, 'continent', FILTER_SANITIZE_SPECIAL_CHARS);
-$region = filter_input(INPUT_GET, 'region', FILTER_SANITIZE_SPECIAL_CHARS);
+$choice     = filter_input(INPUT_GET, "choice", FILTER_VALIDATE_INT);
+$continent  = filter_input(INPUT_GET, 'continent', FILTER_SANITIZE_SPECIAL_CHARS);
+$region     = filter_input(INPUT_GET, 'region', FILTER_SANITIZE_SPECIAL_CHARS);
 $government = filter_input(INPUT_GET, 'government', FILTER_SANITIZE_SPECIAL_CHARS);
-$language = filter_input(INPUT_GET, 'language', FILTER_SANITIZE_SPECIAL_CHARS);
+$language   = filter_input(INPUT_GET, 'language', FILTER_SANITIZE_SPECIAL_CHARS);
 
 
 if ($choice == NULL) {
-    error_log("choice is NULL", 0);
+   error_log("choice is NULL", 0);
 }
+
 
 query($choice, $continent, $region, $government, $language);
 
+
 function query($choice, $continent, $region, $government, $language) {
-    switch ($choice) {
-        case 1:
-            view1($continent, $region, $government);
-            break;
-        case 2:
-            view2($continent, $region, $language);
-            break;
-        case 3:
-            view3($continent, $region, $government);
-            break;
-        case 4:
-            view4($continent);
-            break;
-        case 20:
-            getContinents();
-            break;
-        case 30:
-            getRegions();
-            break;
-        case 40:
-            getGovernments();
-            break;
-        case 50:
-            getLanguages();
-            break;
-    }
+   
+   $json = " ";
+   
+   switch ($choice) {
+      case 1:
+         $json = view1($continent, $region, $government);
+         break;
+      case 2:
+         $json = view2($continent, $region, $language);
+         break;
+      case 3:
+         $json = view3($continent, $region, $government);
+         break;
+      case 4:
+         $json = view4($continent);
+         break;
+      case 20:
+         $json = getContinents();
+         break;
+      case 30:
+         $json = getRegions();
+         break;
+      case 40:
+         $json = getGovernments();
+         break;
+      case 50:
+         $json = getLanguages();
+         break;
+   }
+   
+   echo $json;
 }
 
 /*
@@ -71,168 +78,166 @@ function query($choice, $continent, $region, $government, $language) {
  */
 
 function editWhereClause($params, $string) {
-    $cnt = 1;
-    foreach ($params as $param) {
-        if (strcmp($param, "All") == 0) {
-            $str = "([.a-zA-Z]+ = " . $cnt . "[ and ]*)";
-            $string = preg_replace($str, "", $string);
-        }
-        $cnt++;
-    }
-
-    $string = preg_replace("([ and ]*$)", "", $string);
-    $string = preg_replace("([0-9])", "?", $string);
-
-    if (strcmp($string, "where") == 0) {
-        $string = "";
-    }
-
-    return $string;
+   $cnt = 1;
+   foreach ($params as $param) {
+      if (strcmp($param, "All") == 0) {
+         $str    = "([.a-zA-Z]+ = " . $cnt . "['and' ]*)";
+         $string = preg_replace($str, "", $string);
+      }
+      $cnt++;
+   }
+   
+   $string = preg_replace("(['and' ]*$)", "", $string);
+   $string = preg_replace("([0-9])", "?", $string);
+   
+   if (strcmp($string, "where") == 0) {
+      $string = "";
+   }
+   
+   return $string;
 }
 
 function getContinents() {
-    try {
-        global $conn;
-        $stmt = $conn->prepare("select distinct Continent FROM Country order by Continent");
-        $stmt->execute();
-
-        // set the resulting array to associative
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $outp = "";
-        foreach ($result as $row) {
-            if ($outp != "") {
-                $outp .= ",";
-            }
-            $outp .= '"' . $row["Continent"] . '"';
-        }
-        $outp = '{"continents":[' . $outp . ']}';
-        $conn = null;
-        echo($outp);
-    } catch (PDOException $e) {
-        error_log("getContinents() Error: " . $e->getMessage(), 0);
-    }
+   
+   $json = " ";
+   
+   try {
+      global $conn;
+      
+      $stmt = $conn->prepare("select distinct Continent FROM Country order by Continent");
+      
+      $result = runSearch($stmt);
+      
+      $json = createJsonResponse($result, "Continent", "continents");
+   }
+   catch (PDOException $e) {
+      error_log("getContinents() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $json;
 }
 
 function getRegions() {
-    try {
-        global $conn;
-        $stmt = $conn->prepare("select distinct Region FROM Country order by Region");
-        $stmt->execute();
-
-        // set the resulting array to associative
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $outp = "";
-        foreach ($result as $row) {
-            if ($outp != "") {
-                $outp .= ",";
-            }
-            $outp .= '"' . $row["Region"] . '"';
-        }
-        $outp = '{"regions":[' . $outp . ']}';
-        $conn = null;
-        echo($outp);
-    } catch (PDOException $e) {
-        error_log("getRegions() Error: " . $e->getMessage(), 0);
-    }
+   
+   $json = " ";
+   
+   try {
+      global $conn;
+      
+      $stmt = $conn->prepare("select distinct Region FROM Country order by Region");
+      
+      $result = runSearch($stmt);
+      
+      $json = createJsonResponse($result, "Region", "regions");
+   }
+   catch (PDOException $e) {
+      error_log("getRegions() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $json;
 }
 
 function getGovernments() {
-    try {
-        global $conn;
-        $stmt = $conn->prepare("select distinct GovernmentForm FROM Country order by GovernmentForm");
-        $stmt->execute();
-
-        // set the resulting array to associative
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $outp = "";
-        foreach ($result as $row) {
-            if ($outp != "") {
-                $outp .= ",";
-            }
-            $outp .= '"' . $row["GovernmentForm"] . '"';
-        }
-        $outp = '{"governments":[' . $outp . ']}';
-        $conn = null;
-        echo($outp);
-    } catch (PDOException $e) {
-        error_log("getGovernments() Error: " . $e->getMessage(), 0);
-    }
+   
+   $json = " ";
+   
+   try {
+      global $conn;
+      
+      $stmt = $conn->prepare("select distinct GovernmentForm FROM Country order by GovernmentForm");
+      
+      $result = runSearch($stmt);
+      
+      $json = createJsonResponse($result, "GovernmentForm", "governments");
+   }
+   catch (PDOException $e) {
+      error_log("getGovernments() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $json;
 }
 
 function getLanguages() {
-    try {
-        global $conn;
-        $stmt = $conn->prepare("select distinct Language FROM CountryLanguage order by Language");
-        $stmt->execute();
-
-        // set the resulting array to associative
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $outp = "";
-        foreach ($result as $row) {
-            if ($outp != "") {
-                $outp .= ",";
-            }
-            $outp .= '"' . $row["Language"] . '"';
-        }
-        $outp = '{"languages":[' . $outp . ']}';
-        $conn = null;
-        echo($outp);
-    } catch (PDOException $e) {
-        error_log("getLanguages() Error: " . $e->getMessage(), 0);
-    }
+   
+   $json = " ";
+   
+   try {
+      global $conn;
+      $stmt = $conn->prepare("select distinct Language FROM CountryLanguage order by Language");
+      
+      $result = runSearch($stmt);
+      
+      $json = createJsonResponse($result, "Language", "languages");
+   }
+   catch (PDOException $e) {
+      error_log("getLanguages() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $json;
 }
 
 function view1($continent, $region, $government) {
-    try {
-        $params = array($continent, $region, $government);
-        $where = editWhereClause($params, "where Continent = 1 and Region = 2 and GovernmentForm = 3");
-
-        global $conn;
-        $stmt = $conn->prepare("select Code, Name AS Country, Continent, Region, GovernmentForm, Population FROM Country " . $where);
-
-        $cnt = 1;
-        if (strcmp($continent, "All") != 0) {
-            $stmt->bindParam($cnt, $continent);
-            $cnt++;
-        }
-        if (strcmp($region, "All") != 0) {
-            $stmt->bindParam($cnt, $region);
-            $cnt++;
-        }
-        if (strcmp($government, "All") != 0) {
-            $stmt->bindParam($cnt, $government);
-        }
-        $stmt->execute();
-
-        // set the resulting array to associative
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $outp = "";
-        foreach ($result as $row) {
-            if ($outp != "") {
-                $outp .= ",";
-            }
-            $outp .= '{"Code":"' . $row["Code"] . '",';
-            $outp .= '"Country":"' . $row["Country"] . '",';
-            $outp .= '"Continent":"' . $row["Continent"] . '",';
-            $outp .= '"Region":"' . $row["Region"] . '",';
-            $outp .= '"GovernmentForm":"' . $row["GovernmentForm"] . '",';
-            $outp .= '"Population":"' . $row["Population"] . '"}';
-        }
-        $outp = '{"records":[' . $outp . ']}';
-        $conn = null;
-        echo($outp);
-    } catch (PDOException $e) {
-        error_log("view1() Error: " . $e->getMessage(), 0);
-    }
+   
+   $json = " ";
+   
+   try {
+      $params = array(
+         $continent,
+         $region,
+         $government
+      );
+      $where  = editWhereClause($params, "where Continent = 1 and Region = 2 and GovernmentForm = 3");
+      
+      global $conn;
+      $stmt = $conn->prepare("select Code, Name AS Country, Continent, Region, GovernmentForm, Population FROM Country " . $where);
+      
+      $cnt = 1;
+      if (strcmp($continent, "All") != 0) {
+         $stmt->bindParam($cnt, $continent);
+         $cnt++;
+      }
+      if (strcmp($region, "All") != 0) {
+         $stmt->bindParam($cnt, $region);
+         $cnt++;
+      }
+      if (strcmp($government, "All") != 0) {
+         $stmt->bindParam($cnt, $government);
+      }
+      
+      $result = runSearch($stmt);
+      
+      $parameterArray = array(
+         "Code",
+         "Country",
+         "Continent",
+         "Region",
+         "GovernmentForm",
+         "Population"
+      );
+      
+      $json = createJsonResponse($result, $parameterArray, "records");
+   }
+   catch (PDOException $e) {
+      error_log("view1() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $json;
 }
 
 function view2($continent, $region, $language) {
-    try {
-        $params = array($continent, $region, $language);
-        $where = editWhereClause($params, "where co.Continent = 1 and co.Region = 2 and col.Language = 3");
-
-        global $conn;
-        $stmt = $conn->prepare("select co.Name AS Country, co.Continent, co.Region, ci.Name AS Capital, col.Language AS 'Official Language', 
+   
+   $json = " ";
+   
+   try {
+      $params = array(
+         $continent,
+         $region,
+         $language
+      );
+      $where  = editWhereClause($params, "where co.Continent = 1 and co.Region = 2 and col.Language = 3");
+      
+      global $conn;
+      $stmt = $conn->prepare("select co.Name AS Country, co.Continent, co.Region, ci.Name AS Capital, col.Language AS 'Official Language', 
                                 cpl.Language AS 'Primary Language', co.Population/1000000 AS 'Pop. Millions', co.LifeExpectancy
                                 from Country AS co
                                 inner join City AS ci on ci.ID = co.Capital
@@ -242,130 +247,191 @@ function view2($continent, $region, $language) {
                                    select distinct * from CountryLanguage 
                                    order by CountryLanguage.Percentage desc
                                 ) AS cpl on cpl.CountryCode = co.Code " . $where . " group by co.Name");
-
-        $cnt = 1;
-        if (strcmp($continent, "All") != 0) {
-            $stmt->bindParam($cnt, $continent);
-            $cnt++;
-        }
-        if (strcmp($region, "All") != 0) {
-            $stmt->bindParam($cnt, $region);
-            $cnt++;
-        }
-        if (strcmp($language, "All") != 0) {
-            $stmt->bindParam($cnt, $language);
-        }
-        $stmt->execute();
-
-        // set the resulting array to associative
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $outp = "";
-        foreach ($result as $row) {
-            if ($outp != "") {
-                $outp .= ",";
-            }
-            $outp .= '{"Country":"' . $row["Country"] . '",';
-            $outp .= '"Continent":"' . $row["Continent"] . '",';
-            $outp .= '"Region":"' . $row["Region"] . '",';
-            $outp .= '"Capital":"' . $row["Capital"] . '",';
-            $outp .= '"OfficialLanguage":"' . $row["Official Language"] . '",';
-            $outp .= '"PrimaryLanguage":"' . $row["Primary Language"] . '",';
-            $outp .= '"PopMillions":"' . $row["Pop. Millions"] . '",';
-            $outp .= '"LifeExpectancy":"' . $row["LifeExpectancy"] . '"}';
-        }
-        $outp = '{"records":[' . $outp . ']}';
-        $conn = null;
-        echo($outp);
-    } catch (PDOException $e) {
-        error_log("view2() Error: " . $e->getMessage(), 0);
-    }
+      
+      $cnt = 1;
+      if (strcmp($continent, "All") != 0) {
+         $stmt->bindParam($cnt, $continent);
+         $cnt++;
+      }
+      if (strcmp($region, "All") != 0) {
+         $stmt->bindParam($cnt, $region);
+         $cnt++;
+      }
+      if (strcmp($language, "All") != 0) {
+         $stmt->bindParam($cnt, $language);
+      }
+      
+      $result = runSearch($stmt);
+      
+      $parameterArray = array(
+         "Country",
+         "Continent",
+         "Region",
+         "Capital",
+         "OfficialLanguage:Official Language",
+         "PrimaryLanguage:Primary Language",
+         "PopMillions:Pop. Millions",
+         "LifeExpectancy"
+      );
+      
+      $json = createJsonResponse($result, $parameterArray, "records");
+   }
+   catch (PDOException $e) {
+      error_log("view2() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $json;
 }
 
 function view3($continent, $region, $government) {
-    try {
-        $params = array($continent, $region, $government);
-        $where = editWhereClause($params, "where co.Continent = 1 and co.Region = 2 and co.GovernmentForm = 3");
-
-        global $conn;
-        $stmt = $conn->prepare("select co.Name AS Country, co.Continent, co.Region, 
+   
+   $json = " ";
+   
+   try {
+      $params = array(
+         $continent,
+         $region,
+         $government
+      );
+      $where  = editWhereClause($params, "where co.Continent = 1 and co.Region = 2 and co.GovernmentForm = 3");
+      
+      global $conn;
+      $stmt = $conn->prepare("select co.Name AS Country, co.Continent, co.Region, 
         co.GovernmentForm, ci.Name AS Capital, co.SurfaceArea AS km2, co.GNP, 
         FORMAT(Max(((co.GNP - co.GNPOld) / co.GNP) * 100), 2) AS 'GNP Increase'
         from Country AS co
         inner join City ci on ci.ID=co.Capital " . $where . " group by co.Name");
-
-        $cnt = 1;
-        if (strcmp($continent, "All") != 0) {
-            $stmt->bindParam($cnt, $continent);
-            $cnt++;
-        }
-        if (strcmp($region, "All") != 0) {
-            $stmt->bindParam($cnt, $region);
-            $cnt++;
-        }
-        if (strcmp($government, "All") != 0) {
-            $stmt->bindParam($cnt, $government);
-        }
-        $stmt->execute();
-
-        // set the resulting array to associative
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $outp = "";
-        foreach ($result as $row) {
-            if ($outp != "") {
-                $outp .= ",";
-            }
-            $outp .= '{"Country":"' . $row["Country"] . '",';
-            $outp .= '"Continent":"' . $row["Continent"] . '",';
-            $outp .= '"Region":"' . $row["Region"] . '",';
-            $outp .= '"GovernmentForm":"' . $row["GovernmentForm"] . '",';
-            $outp .= '"Capital":"' . $row["Capital"] . '",';
-            $outp .= '"km2":"' . $row["km2"] . '",';
-            $outp .= '"GNP":"' . $row["GNP"] . '",';
-            $outp .= '"GNPIncrease":"' . $row["GNP Increase"] . '"}';
-        }
-        $outp = '{"records":[' . $outp . ']}';
-        $conn = null;
-        echo($outp);
-    } catch (PDOException $e) {
-        error_log("view3() Error: " . $e->getMessage(), 0);
-    }
+      
+      $cnt = 1;
+      if (strcmp($continent, "All") != 0) {
+         $stmt->bindParam($cnt, $continent);
+         $cnt++;
+      }
+      if (strcmp($region, "All") != 0) {
+         $stmt->bindParam($cnt, $region);
+         $cnt++;
+      }
+      if (strcmp($government, "All") != 0) {
+         $stmt->bindParam($cnt, $government);
+      }
+      
+      $result = runSearch($stmt);
+      
+      $parameterArray = array(
+         "Country",
+         "Continent",
+         "Region",
+         "GovernmentForm",
+         "Capital",
+         "km2",
+         "GNP",
+         "GNPIncrease:GNP Increase"
+      );
+      
+      $json = createJsonResponse($result, $parameterArray, "records");
+   }
+   catch (PDOException $e) {
+      error_log("view3() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $json;
 }
 
 function view4($continent) {
-    try {
-        $params = array($continent);
-        $where = editWhereClause($params, "where a.Continent = 1");
-
-        global $conn;
-        $stmt = $conn->prepare("select a.Continent, b.GNP_Increase, a.Name AS Country
+   
+   $json = " ";
+   
+   try {
+      $params = array(
+         $continent
+      );
+      $where  = editWhereClause($params, "where a.Continent = 1");
+      
+      global $conn;
+      $stmt = $conn->prepare("select a.Continent, b.GNP_Increase, a.Name AS Country
 	from Country as a
         inner join (
         select Continent, max(((GNP - GNPOld) / GNP) * 100) AS GNP_Increase
         from Country
         GROUP BY Continent
         ) b on (((a.GNP - a.GNPOld) / a.GNP) * 100) = b.GNP_Increase and a.Continent = b.Continent " . $where);
+      
+      if (strcmp($continent, "All") != 0) {
+         $stmt->bindParam(1, $continent);
+      }
+      
+      $result = runSearch($stmt);
+      
+      $parameterArray = array(
+         "Continent",
+         "GNP_Increase",
+         "Country"
+      );
+      
+      $json = createJsonResponse($result, $parameterArray, "records");
+   }
+   catch (PDOException $e) {
+      error_log("view4() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $json;
+}
 
-        if (strcmp($continent, "All") != 0) {
-            $stmt->bindParam(1, $continent);
-        }
-        $stmt->execute();
 
-        // set the resulting array to associative
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $outp = "";
-        foreach ($result as $row) {
-            if ($outp != "") {
-                $outp .= ",";
+// Create json response
+function createJsonResponse($result, $parameters, $rootName) {
+   
+   $json    = "";
+   $isArray = is_array($parameters);
+   
+   foreach ($result as $row) {
+      if ($json != "") {
+         $json .= ",";
+      }
+      
+      if ($isArray) {
+         
+         $json .= '{';
+         
+         foreach ($parameters as $parameter) {
+            $tokens = explode(":", $parameter);
+            if (count($tokens) > 1) {
+               $json .= '"' . $tokens[0] . '":"' . $row[$tokens[1]] . '",';
+            } else {
+               $json .= '"' . $parameter . '":"' . $row[$parameter] . '",';
             }
-            $outp .= '{"Continent":"' . $row["Continent"] . '",';
-            $outp .= '"GNP_Increase":"' . $row["GNP_Increase"] . '",';
-            $outp .= '"Country":"' . $row["Country"] . '"}';
-        }
-        $outp = '{"records":[' . $outp . ']}';
-        $conn = null;
-        echo($outp);
-    } catch (PDOException $e) {
-        error_log("view4() Error: " . $e->getMessage(), 0);
-    }
+         }
+         
+         $json = chop($json, ",");
+         
+         $json .= '}';
+      } else {
+         $json .= '"' . $row[$parameters] . '"';
+      }
+   }
+   
+   $json = '{"' . $rootName . '":[' . $json . ']}';
+   
+   return $json;
+}
+
+
+/*
+Conduct a keymatch search of a database table
+*/
+function runSearch($stmt) {
+   $result = "";
+   
+   try {
+      $stmt->execute();
+      
+      // set the resulting array to associative
+      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+   }
+   catch (PDOException $e) {
+      error_log("view1() Error: " . $e->getMessage(), 0);
+   }
+   
+   return $result;
 }
 ?>

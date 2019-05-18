@@ -24,7 +24,7 @@ body{
     margin : 15px;
 }
 
-h1, h3{
+h1, h2, h3, h4{
     text-align: center;
     margin: 3px;
 }
@@ -71,8 +71,9 @@ select{
 form#control {
     padding: 10px;
     margin: 10px; 
-    width: 98%;
-    background-color : rgb(255, 153, 102);
+	margin-left: 10%;
+    width: 80%;
+    background-color : rgb(235, 235, 224);
     border: 3px solid grey;
     border-radius: 25px;	
     border-style: outset;
@@ -129,7 +130,7 @@ table thead, table tbody tr {
 }
 
 thead th{
-    background-color: rgb(255, 204, 153);
+    background-color: rgb(255, 218, 179);
 }
 
 table th, table td {

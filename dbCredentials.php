@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 $hostname = "localhost";
-$username = "mweigel";
+$username = "yourName";
 $password = "yourPassword";
 $database = "world";
 ?> 

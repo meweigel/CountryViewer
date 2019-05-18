@@ -39,7 +39,7 @@ app.controller('countryViewCtrl', function ($scope, $http) {
     $scope.sortReverse = false;  // set the default sort order
     $scope.hideInput = true;
     $scope.table = undefined;
-    $scope.viewList = ["Overview", "Cap/Lang/Pop/Life", "Gov/Cap/Area/GNP/GNPIncr", "Continent/GNPIncr"];
+    $scope.viewList = ["Overview", "Capitol/Language/Population/Life Span", "Government/Capitol/Area/GNP/GNPIncr", "Continent/GNPIncr"];
     $scope.selectedView;
 
 

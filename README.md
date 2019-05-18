@@ -5,17 +5,20 @@ This project is a Web Application allowing a user to view various aspects of a w
 according to the view and search parameters selected. It is written using AngularJS, and php
 on the server backend. The database used is MySQL. The LAMP stack used is XAMPP.
 
-Table formation (number and types of columns) is dynamic. 
+Table formation (number and types of columns) is dynamic.  
 
 
 How To
 ------
 * Install the XAMPP open source LAMP stack on Linux
 * Start XAMPP 
-* sudo cp -R countryView/ /opt/lampp/htdocs/
+* sudo cp -R CountryViewer/ /opt/lampp/htdocs/countryView
 * Restart Apache Web Server
+* Load the world_MySQL.sql data into MySQL (MariaDB) - use
+  http://localhost/phpmyadmin/index.php
 * Open a web browser (only tested on Google Chrome and Firefox)
-* Enter http://localhost/countryView/countryView.html in the address bar.
+* Enter http://localhost/countryView/countryView.html in the
+  address bar.
 
 
 Future goals:

@@ -32,45 +32,46 @@ Author: Michael E. Weigel
     </head>      
     <body>
         <div ng-app="countryViewApp" ng-controller="countryViewCtrl"> 
-            <h1>Country Viewer</h1>
+            <h2>Country Viewer</h2>
             <br>
-            <form id="control">
-                <div id="buttonGroup">
-                    <button ng-click="loadCountries(0)">{{viewList[0]}}</button>
-                    <button ng-click="loadCountries(1)">{{viewList[1]}}</button>
-                    <button ng-click="loadCountries(2)">{{viewList[2]}}</button>
-                    <button ng-click="loadCountries(3)">{{viewList[3]}}</button>
-                </div>
-                <br><br><br>  
+            <form id="control"> 
                 <div id="filterGroup">
                     <div class="filter">
-                        <h3>Continent</h3>
+                        <h4>Continent</h4>
                         <select ng-model="selectedContinent">
                             <option ng-repeat="x in continents">{{x}}</option>
                         </select>
                     </div>
                     <div class="filter">
-                        <h3>Region</h3>
+                        <h4>Region</h4>
                         <select ng-model="selectedRegion">
                             <option ng-repeat="x in regions">{{x}}</option>
                         </select>
                     </div>
                     <div class="filter">
-                        <h3>Government</h3>
+                        <h4>Government</h4>
                         <select ng-model="selectedGovernment">
                             <option ng-repeat="x in governments">{{x}}</option>
                         </select>
                     </div>
                     <div class="filter">
-                        <h3>Official Language</h3>
+                        <h4>Official Language</h4>
                         <select ng-model="selectedLanguage">
                             <option ng-repeat="x in languages">{{x}}</option>
                         </select>
                     </div>
                 </div>
+				<div id="buttonGroup">
+                    <button ng-click="loadCountries(0)">{{viewList[0]}}</button>
+                    <button ng-click="loadCountries(1)">{{viewList[1]}}</button>
+                    <button ng-click="loadCountries(2)">{{viewList[2]}}</button>
+                    <button ng-click="loadCountries(3)">{{viewList[3]}}</button>
+                </div> 
             </form>  
+			<br>
             <form id="display" ng-hide="hide">
-                <div class="input-group-addon"><i class="fa fa-search"></i> 
+                <div class="input-group-addon">
+				    <i class="fa fa-search"></i> 
                     <input id="search" type="text" placeholder="Search" ng-model="searchCountry">
                 </div> 
                 <h3 id="view">{{selectedView}}</h3>
