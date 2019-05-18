@@ -97,16 +97,16 @@ function editWhereClause($params, $string) {
    return $string;
 }
 
+
 function getContinents() {
    
    $json = " ";
    
    try {
-      global $conn;
+
+      $sql = "select distinct Continent FROM Country order by Continent";
       
-      $stmt = $conn->prepare("select distinct Continent FROM Country order by Continent");
-      
-      $result = runSearch($stmt);
+      $result = runSearch($sql,null);
       
       $json = createJsonResponse($result, "Continent", "continents");
    }
@@ -122,11 +122,10 @@ function getRegions() {
    $json = " ";
    
    try {
-      global $conn;
+
+      $sql = "select distinct Region FROM Country order by Region";
       
-      $stmt = $conn->prepare("select distinct Region FROM Country order by Region");
-      
-      $result = runSearch($stmt);
+      $result = runSearch($sql,null);
       
       $json = createJsonResponse($result, "Region", "regions");
    }
@@ -142,11 +141,10 @@ function getGovernments() {
    $json = " ";
    
    try {
-      global $conn;
+
+      $sql = "select distinct GovernmentForm FROM Country order by GovernmentForm";
       
-      $stmt = $conn->prepare("select distinct GovernmentForm FROM Country order by GovernmentForm");
-      
-      $result = runSearch($stmt);
+      $result = runSearch($sql,null);
       
       $json = createJsonResponse($result, "GovernmentForm", "governments");
    }
@@ -162,10 +160,10 @@ function getLanguages() {
    $json = " ";
    
    try {
-      global $conn;
-      $stmt = $conn->prepare("select distinct Language FROM CountryLanguage order by Language");
+ 
+      $sql = "select distinct Language FROM CountryLanguage order by Language";
       
-      $result = runSearch($stmt);
+      $result = runSearch($sql,null);
       
       $json = createJsonResponse($result, "Language", "languages");
    }
@@ -186,27 +184,14 @@ function view1($continent, $region, $government) {
          $region,
          $government
       );
+	  
       $where  = editWhereClause($params, "where Continent = 1 and Region = 2 and GovernmentForm = 3");
       
-      global $conn;
-      $stmt = $conn->prepare("select Code, Name AS Country, Continent, Region, GovernmentForm, Population FROM Country " . $where);
+      $sql = "select Code, Name AS Country, Continent, Region, GovernmentForm, Population FROM Country " . $where;
       
-      $cnt = 1;
-      if (strcmp($continent, "All") != 0) {
-         $stmt->bindParam($cnt, $continent);
-         $cnt++;
-      }
-      if (strcmp($region, "All") != 0) {
-         $stmt->bindParam($cnt, $region);
-         $cnt++;
-      }
-      if (strcmp($government, "All") != 0) {
-         $stmt->bindParam($cnt, $government);
-      }
+      $result = runSearch($sql,$params);
       
-      $result = runSearch($stmt);
-      
-      $parameterArray = array(
+      $fieldNames = array(
          "Code",
          "Country",
          "Continent",
@@ -215,7 +200,7 @@ function view1($continent, $region, $government) {
          "Population"
       );
       
-      $json = createJsonResponse($result, $parameterArray, "records");
+      $json = createJsonResponse($result, $fieldNames, "records");
    }
    catch (PDOException $e) {
       error_log("view1() Error: " . $e->getMessage(), 0);
@@ -234,36 +219,23 @@ function view2($continent, $region, $language) {
          $region,
          $language
       );
+	  
       $where  = editWhereClause($params, "where co.Continent = 1 and co.Region = 2 and col.Language = 3");
       
-      global $conn;
-      $stmt = $conn->prepare("select co.Name AS Country, co.Continent, co.Region, ci.Name AS Capital, col.Language AS 'Official Language', 
-                                cpl.Language AS 'Primary Language', co.Population/1000000 AS 'Pop. Millions', co.LifeExpectancy
-                                from Country AS co
-                                inner join City AS ci on ci.ID = co.Capital
-                                inner join CountryLanguage AS col on col.CountryCode = co.Code and col.IsOfficial='T'
-                                inner join 
-                                (
-                                   select distinct * from CountryLanguage 
-                                   order by CountryLanguage.Percentage desc
-                                ) AS cpl on cpl.CountryCode = co.Code " . $where . " group by co.Name");
+      $sql = "select co.Name AS Country, co.Continent, co.Region, ci.Name AS Capital, col.Language AS 'Official Language', " .  
+			 "cpl.Language AS 'Primary Language', co.Population/1000000 AS 'Pop. Millions', co.LifeExpectancy " .
+             "from Country AS co " .
+             "inner join City AS ci on ci.ID = co.Capital " .
+             "inner join CountryLanguage AS col on col.CountryCode = co.Code and col.IsOfficial='T' " .
+             "inner join " . 
+             "( " .
+             "select distinct * from CountryLanguage " .
+             "order by CountryLanguage.Percentage desc " .
+             ") AS cpl on cpl.CountryCode = co.Code " . $where . " group by co.Name";
       
-      $cnt = 1;
-      if (strcmp($continent, "All") != 0) {
-         $stmt->bindParam($cnt, $continent);
-         $cnt++;
-      }
-      if (strcmp($region, "All") != 0) {
-         $stmt->bindParam($cnt, $region);
-         $cnt++;
-      }
-      if (strcmp($language, "All") != 0) {
-         $stmt->bindParam($cnt, $language);
-      }
+      $result = runSearch($sql,$params);
       
-      $result = runSearch($stmt);
-      
-      $parameterArray = array(
+      $fieldNames = array(
          "Country",
          "Continent",
          "Region",
@@ -274,7 +246,7 @@ function view2($continent, $region, $language) {
          "LifeExpectancy"
       );
       
-      $json = createJsonResponse($result, $parameterArray, "records");
+      $json = createJsonResponse($result, $fieldNames, "records");
    }
    catch (PDOException $e) {
       error_log("view2() Error: " . $e->getMessage(), 0);
@@ -293,31 +265,18 @@ function view3($continent, $region, $government) {
          $region,
          $government
       );
+	  
       $where  = editWhereClause($params, "where co.Continent = 1 and co.Region = 2 and co.GovernmentForm = 3");
+
+      $sql = "select co.Name AS Country, co.Continent, co.Region, " .
+        "co.GovernmentForm, ci.Name AS Capital, co.SurfaceArea AS km2, co.GNP, " . 
+        "FORMAT(Max(((co.GNP - co.GNPOld) / co.GNP) * 100), 2) AS 'GNP Increase' " .
+        "from Country AS co " .
+        "inner join City ci on ci.ID=co.Capital " . $where . " group by co.Name";
       
-      global $conn;
-      $stmt = $conn->prepare("select co.Name AS Country, co.Continent, co.Region, 
-        co.GovernmentForm, ci.Name AS Capital, co.SurfaceArea AS km2, co.GNP, 
-        FORMAT(Max(((co.GNP - co.GNPOld) / co.GNP) * 100), 2) AS 'GNP Increase'
-        from Country AS co
-        inner join City ci on ci.ID=co.Capital " . $where . " group by co.Name");
+      $result = runSearch($sql,$params);
       
-      $cnt = 1;
-      if (strcmp($continent, "All") != 0) {
-         $stmt->bindParam($cnt, $continent);
-         $cnt++;
-      }
-      if (strcmp($region, "All") != 0) {
-         $stmt->bindParam($cnt, $region);
-         $cnt++;
-      }
-      if (strcmp($government, "All") != 0) {
-         $stmt->bindParam($cnt, $government);
-      }
-      
-      $result = runSearch($stmt);
-      
-      $parameterArray = array(
+      $fieldNames = array(
          "Country",
          "Continent",
          "Region",
@@ -328,7 +287,7 @@ function view3($continent, $region, $government) {
          "GNPIncrease:GNP Increase"
       );
       
-      $json = createJsonResponse($result, $parameterArray, "records");
+      $json = createJsonResponse($result, $fieldNames, "records");
    }
    catch (PDOException $e) {
       error_log("view3() Error: " . $e->getMessage(), 0);
@@ -345,30 +304,26 @@ function view4($continent) {
       $params = array(
          $continent
       );
+	  
       $where  = editWhereClause($params, "where a.Continent = 1");
       
-      global $conn;
-      $stmt = $conn->prepare("select a.Continent, b.GNP_Increase, a.Name AS Country
-	from Country as a
-        inner join (
-        select Continent, max(((GNP - GNPOld) / GNP) * 100) AS GNP_Increase
-        from Country
-        GROUP BY Continent
-        ) b on (((a.GNP - a.GNPOld) / a.GNP) * 100) = b.GNP_Increase and a.Continent = b.Continent " . $where);
+      $sql = "select a.Continent, b.GNP_Increase, a.Name AS Country from Country as a " .
+        "inner join ( " .
+        "select Continent, max(((GNP - GNPOld) / GNP) * 100) AS GNP_Increase " .
+        "from Country " .
+        "GROUP BY Continent " .
+        ") b on (((a.GNP - a.GNPOld) / a.GNP) * 100) = b.GNP_Increase and a.Continent = b.Continent " . $where;
       
-      if (strcmp($continent, "All") != 0) {
-         $stmt->bindParam(1, $continent);
-      }
       
-      $result = runSearch($stmt);
+      $result = runSearch($sql,$params);
       
-      $parameterArray = array(
+      $fieldNames = array(
          "Continent",
          "GNP_Increase",
          "Country"
       );
       
-      $json = createJsonResponse($result, $parameterArray, "records");
+      $json = createJsonResponse($result, $fieldNames, "records");
    }
    catch (PDOException $e) {
       error_log("view4() Error: " . $e->getMessage(), 0);
@@ -419,18 +374,33 @@ function createJsonResponse($result, $parameters, $rootName) {
 /*
 Conduct a keymatch search of a database table
 */
-function runSearch($stmt) {
+function runSearch($sql, $params) {
+   global $conn;
    $result = "";
    
    try {
+	   
+	  $stmt = $conn->prepare($sql);
+	  
+	  if($params != null && is_array($params)){
+		  $total = count($params);
+		  $cnt = 1;
+		  for ($x = 0; $x < $total; $x++) { 
+			 if (strcmp($params[$x], "All") != 0) {
+				 $stmt->bindParam($cnt, $params[$x]);
+				 $cnt++;
+			 }
+		  }
+	  }
+	  
       $stmt->execute();
       
-      // set the resulting array to associative
-      $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	  $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
    catch (PDOException $e) {
       error_log("view1() Error: " . $e->getMessage(), 0);
    }
+   
    
    return $result;
 }
