@@ -61,17 +61,17 @@ Author: Michael E. Weigel
                         </select>
                     </div>
                 </div>
-				<div id="buttonGroup">
+                <div id="buttonGroup">
                     <button ng-click="loadCountries(0)">{{viewList[0]}}</button>
                     <button ng-click="loadCountries(1)">{{viewList[1]}}</button>
                     <button ng-click="loadCountries(2)">{{viewList[2]}}</button>
                     <button ng-click="loadCountries(3)">{{viewList[3]}}</button>
                 </div> 
             </form>  
-			<br>
+            <br>
             <form id="display" ng-hide="hide">
                 <div class="input-group-addon">
-				    <i class="fa fa-search"></i> 
+                    <i class="fa fa-search"></i> 
                     <input id="search" type="text" placeholder="Search" ng-model="searchCountry">
                 </div> 
                 <h3 id="view">{{selectedView}}</h3>

@@ -372,7 +372,7 @@ function createJsonResponse($result, $parameters, $rootName) {
 
 
 /*
-Conduct a keymatch search of a database table
+Conduct a search of a database table
 */
 function runSearch($sql, $params) {
    global $conn;
@@ -393,9 +393,9 @@ function runSearch($sql, $params) {
 		  }
 	  }
 	  
-      $stmt->execute();
+          $stmt->execute();
       
-	  $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
    catch (PDOException $e) {
       error_log("view1() Error: " . $e->getMessage(), 0);

@@ -156,7 +156,7 @@ app.controller('countryViewCtrl', function ($scope, $http) {
         if ($scope.table) {
             var tbody = $scope.table.tBodies[0];
             var placeholder = document.createElement('tbody');
-            table.replaceChild(placeholder, tbody);
+            $scope.table.replaceChild(placeholder, tbody);
             $scope.sortRows(tbody, function compare(topRow, bottomRow) {
                 var top = topRow.cells[col].textContent;
                 var bot = bottomRow.cells[col].textContent;
