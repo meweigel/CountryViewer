@@ -5,7 +5,7 @@ This project is a Web Application allowing a user to view various aspects of a w
 according to the view and search parameters selected. It is written using AngularJS, and php7
 on the server backend. The database used is Mariadb.
 
-Table formation (number and types of columns) is dynamic.
+Table formation (number and types of columns) is dynamic. SQL queries are dynamically created utilizing user interaction.
 
 
 How To Using XAMPP
