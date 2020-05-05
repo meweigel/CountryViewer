@@ -3,9 +3,9 @@ Project Country Viewer
 
 This project is a Web Application allowing a user to view various aspects of a world database
 according to the view and search parameters selected. It is written using AngularJS, and php7
-on the server backend. The database used is Mariadb. 
+on the server backend. The database used is Mariadb.
 
-Table formation (number and types of columns) is dynamic.  
+Table formation (number and types of columns) is dynamic.
 
 
 How To Using XAMPP
@@ -31,60 +31,55 @@ How To Using Linux LAMP Stack
 -----------------------------
 * Please see: https://computingforgeeks.com/how-to-install-lamp-stack-on-fedora/
 
-    sudo dnf -y update
-    sudo dnf -y install vim bash-completion curl wget telnet
-    sudo setenforce 0
-    sudo sed -i 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config
-    sudo dnf -y install httpd
-    sudo systemctl start httpd
-    sudo systemctl enable httpd
-    sudo firewall-cmd --add-service={http,https} --permanent
-    sudo dnf -y install php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip
-    sudo dnf install php-json.x86_64
-    sudo dnf install mariadb-server
-
-    sudo vim /etc/my.cnf.d/mariadb-server.cnf
-
+   - sudo dnf -y update
+   - sudo dnf -y install vim bash-completion curl wget telnet
+   - sudo setenforce 0
+   - sudo sed -i 's/^SELINUX=.*/SELINUX=permissive/g' /etc/selinux/config
+   - sudo dnf -y install httpd
+   - sudo systemctl start httpd
+   - sudo systemctl enable httpd
+   - sudo firewall-cmd --add-service={http,https} --permanent
+   - sudo dnf -y install php php-cli php-php-gettext php-mbstring php-mcrypt php-mysqlnd php-pear php-curl php-gd php-xml php-bcmath php-zip
+   - sudo dnf install php-json.x86_64
+   - sudo dnf install mariadb-server
+   - sudo vim /etc/my.cnf.d/mariadb-server.cnf
         Set your character set under [mysqld] section
-
         [mysqld]
         character-set-server=utf8
 
-    sudo systemctl start mariadb
-    sudo systemctl enable mariadb
-    sudo firewall-cmd --add-service=mysql --permanent
-    sudo firewall-cmd --reload
+   - sudo systemctl start mariadb
+   - sudo systemctl enable mariadb
+   - sudo firewall-cmd --add-service=mysql --permanent
+   - sudo firewall-cmd --reload
+   - sudo vim /var/www/html/phpinfo.php
 
-    sudo vim /var/www/html/phpinfo.php
-
-    Add:
-
+     Add:
+```
     <?php
        // Show all information, defaults to INFO_ALL
        phpinfo();
     ?>
+```
+    - sudo systemctl reload httpd
 
-    sudo systemctl reload httpd
+    - Open and verify PHP info page http://localhost/phpinfo.php
 
-    Open added PHP info page http://localhost/phpinfo.php
-
-    sudo dnf install phpmyadmin
+* sudo dnf install **phpmyadmin**
 
 * sudo cp -R countryView/ /var/www/html/
 
 * Edit /var/www/html/countryView/dbCredentials.php
 
-  Add the username and password
+      Add the username and password
   
 * Perform MariaDB initial settings like setting up a root password, disabling remote root login e.t.c:
 
-  $ mysql_secure_installation 
+  $   mysql_secure_installation 
 
 * Restart Apache Web Server
 
 * Load the world_MySQL.sql data into MySQL (MariaDB) - use
   http://localhost/phpmyadmin/index.php
-  
   Login as root with the assigned root password
 
 * Add a new user: the username and password, and give this user only select privileges
@@ -104,4 +99,3 @@ Future goals:
 * Create server side code using nodejs.
 * Create server side code using JAVA jsp.
 * Create server side code using Python.
-
